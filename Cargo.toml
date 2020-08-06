@@ -1,0 +1,13 @@
+[package]
+name = "cass_log_watcher"
+version = "0.1.0"
+authors = ["BuildTools <akrupin@team.amocrm.com>"]
+edition = "2018"
+
+[dependencies]
+influx_db_client = "0.4.2"
+logwatcher = "0.1"
+clap = "2.33.1"
+url = "2.1.1"
+time = "*"
+tokio = "0.2.22"
