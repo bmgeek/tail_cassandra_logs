@@ -47,20 +47,27 @@ fn file_monitor(file: &str) {
         if line.contains("timeout") {
             let start = Instant::now();
             let mut data = InfluxData::table(&line);
-            let vec_line: Vec<&str> = data.req_body.split_whitespace().collect();
+            let mut vec_line: Vec<&str> = data.req_body[0..line.len()-23]
+                .split_whitespace()
+                .collect();
+            vec_line.reverse();
             for (p, i) in vec_line.iter().enumerate() {
-                if i.contains("time") {
-                    match vec_line[p+1].parse::<i64>() {
-                        Ok(n) => data.time_query = n,
-                        Err(e) => {
-                            println!("can't parse {}", e);
-                            continue;
+                if i.contains("msec") {
+                    let st: Vec<&str> = vec_line[p+1].split("/").collect();
+                    for slow_times in st.iter() {
+                        match slow_times.parse::<i64>() {
+                            Ok(n) => {
+                                data.time_query = n;
+                            }
+                            Err(e) => {
+                                println!("can't parse {}", e);
+                                continue;
+                            }
                         }
-                    };                    
-                    influx_insert(data);
-                    let end = Instant::now();
-                    println!("{:?} seconds for whatever you did.", end-start);
-                    break;
+                        influx_insert(&data);
+                        let end = Instant::now();
+                        println!("{:?} seconds for whatever you did.", end-start);
+                    };
                 }          
             }
         }
